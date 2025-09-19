@@ -1,0 +1,17 @@
+
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "app-chart.fullname" . }}-backend-sm
+  labels:
+    release: prometheus
+spec:
+  jobLabel: app
+  selector:
+    matchLabels:
+      app: {{ include "app-chart.name" . }}
+      component: backend
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 15s

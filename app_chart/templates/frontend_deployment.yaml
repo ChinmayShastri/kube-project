@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "app-chart.fullname" . }}-frontend
+  labels:
+    app: {{ include "app-chart.name" . }}
+    component: frontend
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "app-chart.name" . }}
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: {{ include "app-chart.name" . }}
+        component: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: "{{ .Values.frontend.image }}"
+        ports:
+        - containerPort: {{ .Values.frontend.port }}
