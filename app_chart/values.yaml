@@ -1,0 +1,18 @@
+backend:
+  image: <ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/eks-poc-backend:latest
+  port: 8000
+  replicas: 1
+
+frontend:
+  image: <ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/eks-poc-frontend:latest
+  port: 80
+  replicas: 1
+
+service:
+  frontend:
+    type: LoadBalancer
+  backend:
+    type: ClusterIP
+
+prometheus:
+  scrape: true   # we will add annotations for scrape
