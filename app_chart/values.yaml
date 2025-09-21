@@ -1,10 +1,10 @@
 backend:
-  image: <ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/eks-poc-backend:latest
+  image: devops108/backend_repo:latest
   port: 8000
   replicas: 1
 
 frontend:
-  image: <ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/eks-poc-frontend:latest
+  image: devops108/frontend_repo:latest
   port: 80
   replicas: 1
 

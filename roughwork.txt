@@ -1,1 +1,54 @@
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 482856388587.dkr.ecr.us-east-1.amazonaws.com
+aws ecr create-repository --repository-name eks-poc-backend --region us-east-1
+aws ecr create-repository --repository-name eks-poc-backend --region us-east-1
+
+aws ecr get-login-password --region us-east-1| docker login --username AWS --password-stdin 119261019513.dkr.ecr.us-east-1.amazonaws.com
+
+cd backend
+docker build -t eks-poc-backend:latest .
+docker tag eks-poc-backend:latest 119261019513.dkr.ecr.us-east-1.amazonaws.com/eks-poc-backend:latest
+docker push 119261019513.dkr.ecr.us-east-1.amazonaws.com/eks-poc-backend:latest
+
+#!/bin/bash
+
+sudo su -
+
+yum install git -y
+
+mkdir /root/proj
+
+cd /root/proj
+
+git init
+
+git clone https://github.com/ChinmayShastri/kube-project.git
+
+cd 
+
+yum install docker -y
+
+systemctl start docker.service
+
+curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/1.33.4/2025-08-20/bin/linux/amd64/kubectl
+
+chmod +x ./kubectl
+
+mkdir -p $HOME/bin && cp ./kubectl $HOME/bin/kubectl && export PATH=$HOME/bin:$PATH
+
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+
+chmod 777 get_helm.sh
+
+./get_helm.sh
+
+curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/cloudformation/2020-10-29/aws-auth-cm.yaml
+
+
+
+aws eks describe-nodegroup --cluster-name demo-eks --nodegroup-name eks-cluster-stack
+
+
+kubectl patch svc app-chart-frontend-svc -n app-poc -p '{"spec": {"type": "NodePort"}}'
+kubectl get svc -n
+
+
+kubectl patch service prometheus-operated -n monitoring -p '{"spec": {"type": "NodePort"}}'
