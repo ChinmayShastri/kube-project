@@ -1,16 +1,18 @@
-
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "app-chart.fullname" . }}-backend-sm
+  name: backend-servicemonitor
+  namespace: monitoring
   labels:
-    release: prometheus
+    release: prometheus    # must match your Prometheus release name
 spec:
-  jobLabel: app
   selector:
     matchLabels:
-      app: {{ include "app-chart.name" . }}
+      app: app-chart
       component: backend
+  namespaceSelector:
+    matchNames:
+    - app-poc
   endpoints:
   - port: http
     path: /metrics

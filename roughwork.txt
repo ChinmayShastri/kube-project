@@ -43,7 +43,6 @@ chmod 777 get_helm.sh
 curl -O https://s3.us-west-2.amazonaws.com/amazon-eks/cloudformation/2020-10-29/aws-auth-cm.yaml
 
 
-
 aws eks describe-nodegroup --cluster-name demo-eks --nodegroup-name eks-cluster-stack
 
 
@@ -52,3 +51,41 @@ kubectl get svc -n
 
 
 kubectl patch service prometheus-operated -n monitoring -p '{"spec": {"type": "NodePort"}}'
+
+
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add grafana https://grafana.github.io/helm-charts
+helm repo update
+
+
+kubectl create namespace monitoring
+helm install prometheus prometheus-community/kube-prometheus-stack \
+  --namespace monitoring \
+  --set grafana.service.type=NodePort \
+  --set grafana.adminUser=admin \
+  --set grafana.adminPassword="YourStrongPassword" \
+  --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false
+
+
+kubectl create namespace app-poc
+helm install app-poc charts/app-chart --namespace app-poc
+
+
+kubectl patch svc pp-chart-frontend-svca -n app-poc -p '{"spec": {"type": "NodePort"}}'
+
+129  yum install python3 -y
+  130  yum install python3-pip -y
+  131  pip install prometheus-client
+  132  cd backend/
+  133  ls
+kubectl patch svc prometheus-grafana -n monitoring -p '{"spec": {"type": "NodePort"}}'
+
+kubectl get svc prometheus-grafana -n monitoring
+
+kubectl patch svc prometheus-kube-prometheus-prometheus -n monitoring -p '{"spec": {"type": "NodePort"}}'
+
+
+
+helm upgrade app-poc ./app_chart -n app-poc \
+  --set backend.image=devops108/backend_repo:latest

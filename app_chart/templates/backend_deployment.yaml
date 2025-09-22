@@ -28,13 +28,13 @@ spec:
         - containerPort: {{ .Values.backend.port }}
         readinessProbe:
           httpGet:
-            path: /health
+            path: /metrics
             port: {{ .Values.backend.port }}
           initialDelaySeconds: 5
           periodSeconds: 10
         livenessProbe:
           httpGet:
-            path: /health
+            path: /metrics
             port: {{ .Values.backend.port }}
           initialDelaySeconds: 15
           periodSeconds: 20

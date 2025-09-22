@@ -10,7 +10,7 @@ frontend:
 
 service:
   frontend:
-    type: LoadBalancer
+    type: NodePort
   backend:
     type: ClusterIP
 

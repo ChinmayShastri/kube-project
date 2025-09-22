@@ -1,42 +1,41 @@
-from fastapi import FastAPI, Request
-import time
+from fastapi import FastAPI
+from fastapi.responses import Response
 import random
-from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
-from starlette.responses import Response
+from prometheus_client import Gauge, generate_latest, CONTENT_TYPE_LATEST
 
 app = FastAPI()
 
-REQUEST_COUNT = Counter('http_requests_total', 'Total HTTP requests', ['method','endpoint','http_status'])
-REQUEST_LATENCY = Histogram('http_request_duration_seconds', 'Request latency seconds', ['endpoint'])
-
-# simple queue gauge simulated
-from prometheus_client import Gauge
-QUEUE_SIZE = Gauge('app_queue_size', 'Simulated background queue size')
-
-@app.get("/health")
-async def health():
-    return {"status":"ok"}
+# Define custom metrics
+processing_time_gauge = Gauge(
+    "backend_processing_time_seconds",
+    "Time spent processing requests"
+)
+queue_gauge = Gauge(
+    "backend_queue_size",
+    "Current queue size"
+)
 
 @app.get("/api/message")
-async def message():
-    endpoint = "/api/message"
-    start = time.time()
-    # simulate variable processing and optional queue push/pop
-    # simulate queue size
-    q = random.randint(0, 30)
-    QUEUE_SIZE.set(q)
+def get_message():
+    processing_time = random.random()
+    queue = random.randint(1, 20)
 
-    # simulate processing latency
-    processing = random.uniform(0.05, 0.7)  # seconds
-    time.sleep(processing)
+    # Update Prometheus gauges
+    processing_time_gauge.set(processing_time)
+    queue_gauge.set(queue)
 
-    latency = time.time() - start
-    REQUEST_LATENCY.labels(endpoint=endpoint).observe(latency)
-    REQUEST_COUNT.labels(method="GET", endpoint=endpoint, http_status="200").inc()
-
-    return {"message": "Hello from backend", "processing_time": processing, "queue": q}
+    return {
+        "message": "Hello from backend",
+        "processing_time": processing_time,
+        "queue": queue
+    }
 
 @app.get("/metrics")
-async def metrics():
-    resp = generate_latest()
-    return Response(content=resp, media_type=CONTENT_TYPE_LATEST)
+def metrics():
+    # Proper Response with correct Content-Type for Prometheus
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+@app.get("/health")
+def health():
+    # Optional health endpoint for K8s probes
+    return {"status": "ok"}
